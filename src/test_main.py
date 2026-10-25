@@ -34,3 +34,24 @@ class TestGeneratePage(unittest.TestCase):
             "      <p>Second paragraph.</p>\n    </article>",
             generated_html,
         )
+
+    def test_generate_page_prefixes_root_relative_assets_with_basepath(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            markdown_path = os.path.join(temp_dir, "index.md")
+            template_path = os.path.join(temp_dir, "template.html")
+            destination_path = os.path.join(temp_dir, "public", "index.html")
+
+            with open(markdown_path, "w", encoding="utf-8") as markdown_file:
+                markdown_file.write("# Title")
+            with open(template_path, "w", encoding="utf-8") as template_file:
+                template_file.write(
+                    '<link href="/index.css"><img src="/images/logo.png">'
+                )
+
+            generate_page(markdown_path, template_path, destination_path, "/project/")
+
+            with open(destination_path, "r", encoding="utf-8") as output_file:
+                generated_html = output_file.read()
+
+        self.assertIn('href="/project/index.css"', generated_html)
+        self.assertIn('src="/project/images/logo.png"', generated_html)

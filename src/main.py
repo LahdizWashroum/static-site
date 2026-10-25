@@ -10,17 +10,12 @@ def main():
     basepath = sys.argv[1] if len(sys.argv) > 1 else "/"
     text_node = TextNode("Hello, World!", TextType.PLAIN, None)
     print(text_node)
-    copy_content()
+    copy_content(destination_dir="docs")
     generate_pages_recursive("content", "template.html", "docs", basepath)
 
-def copy_content():
-    # A recursive function that copies all the contents from a source directory to a destination directory (in our case, static to public)
-    # It should first delete all the contents of the destination directory (public) to ensure that the copy is clean.
-    # It should copy all files and subdirectories, nested files, etc.
+def copy_content(source_dir="static", destination_dir="public"):
+    # Copy all files and subdirectories, replacing any existing destination contents.
     
-    source_dir = "static"
-    destination_dir = "public"
-
     # Delete all contents of the destination directory
     if os.path.exists(destination_dir):
         for root, dirs, files in os.walk(destination_dir, topdown=False):

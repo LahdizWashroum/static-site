@@ -4,6 +4,26 @@ import tempfile
 from main import extract_title, copy_content, generate_page
 
 class TestGeneratePage(unittest.TestCase):
+    def test_copy_content_copies_assets_to_selected_destination(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            source_dir = os.path.join(temp_dir, "static")
+            destination_dir = os.path.join(temp_dir, "docs")
+            os.makedirs(os.path.join(source_dir, "images"))
+            os.makedirs(destination_dir)
+
+            with open(os.path.join(source_dir, "images", "logo.png"), "wb") as asset:
+                asset.write(b"image data")
+            with open(os.path.join(destination_dir, "stale.txt"), "w") as stale_file:
+                stale_file.write("stale")
+
+            copy_content(source_dir, destination_dir)
+
+            copied_asset = os.path.join(destination_dir, "images", "logo.png")
+            self.assertTrue(os.path.isfile(copied_asset))
+            with open(copied_asset, "rb") as asset:
+                self.assertEqual(asset.read(), b"image data")
+            self.assertFalse(os.path.exists(os.path.join(destination_dir, "stale.txt")))
+
     def test_extract_title(self):
         markdown = """
         # My Title
